@@ -8,6 +8,8 @@
 
 import UIKit
 import RealmSwift
+import SwipeCellKit
+
 
 class CategoryTableViewController: UITableViewController {
     
@@ -24,7 +26,9 @@ class CategoryTableViewController: UITableViewController {
     // MARK: - Table view data source
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath) as! SwipeTableViewCell
+        
+        cell.delegate = self
         
         cell.textLabel?.text = categoryArray?[indexPath.row].name ?? "No categories added yet"
         return cell
@@ -104,6 +108,28 @@ class CategoryTableViewController: UITableViewController {
         
         tableView.reloadData()
         
+    }
+    
+    
+    
+}
+
+
+//MARK: - Swipe table view controller methods
+
+extension CategoryTableViewController: SwipeTableViewCellDelegate{
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
+        
+        guard orientation == .right else { return nil }
+        
+        let deleteAction = SwipeAction(style: .destructive, title: "Delete") { action, indexPath in
+            // handle action by updating model with deletion
+        }
+        
+        // customize the action appearance
+        deleteAction.image = UIImage(named: "delete-icon")
+        
+        return [deleteAction]
     }
     
     
