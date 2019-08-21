@@ -8,10 +8,10 @@
 
 import UIKit
 import RealmSwift
-import SwipeCellKit
+//import SwipeCellKit
 
 
-class CategoryTableViewController: UITableViewController {
+class CategoryTableViewController: SwipeTableViewController {
     
     let realm = try! Realm()
     
@@ -19,18 +19,20 @@ class CategoryTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+         
         loadItems()
+
     
     }
 
     // MARK: - Table view data source
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath) as! SwipeTableViewCell
-        
-        cell.delegate = self
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
         cell.textLabel?.text = categoryArray?[indexPath.row].name ?? "No categories added yet"
+        
+        cell.backgroundColor = UIColor(hexString: (categoryArray?[indexPath.row].color) ?? "1D9BF9")
         return cell
     }
     
@@ -52,6 +54,7 @@ class CategoryTableViewController: UITableViewController {
             //print(textField.text)
             let newItem = Categories()
             newItem.name = textField.text == "" ? "New Category" : textField.text!
+            newItem.color = UIColor.randomFlat.hexValue()
 
             self.saveItems(category: newItem )
         }
@@ -110,28 +113,21 @@ class CategoryTableViewController: UITableViewController {
         
     }
     
-    
-    
-}
-
-
-//MARK: - Swipe table view controller methods
-
-extension CategoryTableViewController: SwipeTableViewCellDelegate{
-    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
-        
-        guard orientation == .right else { return nil }
-        
-        let deleteAction = SwipeAction(style: .destructive, title: "Delete") { action, indexPath in
-            // handle action by updating model with deletion
+    //MARK: - Delete date
+    override func updateModel(at indexPath: IndexPath) {
+        if let categoryForDeletion = self.categoryArray?[indexPath.row] {
+            do{
+                try self.realm.write {
+                    self.realm.delete(categoryForDeletion)
+                }
+            }catch{
+                print("Error deleting the data with Error: \(error)")
+            }
+ 
         }
-        
-        // customize the action appearance
-        deleteAction.image = UIImage(named: "delete-icon")
-        
-        return [deleteAction]
     }
     
     
     
 }
+

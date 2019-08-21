@@ -8,9 +8,11 @@
 
 import Foundation
 import RealmSwift
+import ChameleonFramework
 
 class Categories: Object{
-
+    
+    @objc dynamic var color = ""
     @objc dynamic var name: String = ""
     let items = List<Item>()
     
